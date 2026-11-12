@@ -197,15 +197,17 @@
 
         // 5. 外資現貨
         const fSpot = row.foreign_spot_yi || 0;
-        scores.foreign_spot_yi = fSpot >= 0 ? 1 : (fSpot <= -300 ? -1 : 0);
+        scores.foreign_spot_yi = fSpot >= 0 ? 1 : (fSpot <= -100 ? -1 : 0);
         total += scores.foreign_spot_yi;
 
         // 6. 投信現貨
-        scores.trust_spot_yi = (row.trust_spot_yi || 0) >= 0 ? 1 : -1;
+        const tSpot = row.trust_spot_yi || 0;
+        scores.trust_spot_yi = tSpot >= 0 ? 1 : (tSpot <= -100 ? -1 : 0);
         total += scores.trust_spot_yi;
 
         // 7. 自營商現貨
-        scores.dealer_spot_yi = (row.dealer_spot_yi || 0) >= 0 ? 1 : -1;
+        const dSpot = row.dealer_spot_yi || 0;
+        scores.dealer_spot_yi = dSpot >= 0 ? 1 : (dSpot <= -100 ? -1 : 0);
         total += scores.dealer_spot_yi;
 
         // 8. 外資台指期未平倉 (空單減少=數字變大=偏多)
@@ -238,7 +240,7 @@
 
         // 11. P/C比
         const pc = row.pc_ratio_percent || 0;
-        scores.pc_ratio_percent = pc >= 65 ? 1 : (pc <= 55 ? -1 : 0);
+        scores.pc_ratio_percent = pc >= 100 ? 1 : (pc <= 55 ? -1 : 0);
         total += scores.pc_ratio_percent;
 
         // 12. 外資選擇權
