@@ -346,14 +346,20 @@
             tsm_adr_change_percent: '台積電ADR漲跌幅(%)'
         };
 
-        let html = `<p>紅燈（偏多）數量：${redCount}、綠燈（偏空）數量：${greenCount}、總分：${total}</p>`;
-        html += `<table class="score-table"><thead><tr><th>指標</th><th>分數</th></tr></thead><tbody>`;
-        Object.keys(scores).forEach(k => {
-            const s = scores[k];
+        let html = `<table class="score-table"><thead><tr><th>指標</th><th>分數</th><th>說明</th></tr></thead><tbody>`;
+        Object.keys(labels).forEach(key => {
+            const s = scores[key] || 0;
             const cls = s > 0 ? 'score-pos' : (s < 0 ? 'score-neg' : 'score-zero');
-            html += `<tr><td>${labels[k] || k}</td><td class="${cls}">${s > 0 ? '+' : ''}${s}</td></tr>`;
+            const note = s > 0 ? '🔴 紅燈' : (s < 0 ? '🟢 綠燈' : '⚪ 中性');
+            html += `<tr><td>${labels[key]}</td><td class="${cls}">${s > 0 ? '+' : ''}${s}</td><td>${note}</td></tr>`;
         });
-        html += `</tbody></table>`;
+        html += `</tbody></table>
+            <p style="margin-top:15px;font-size:16px;">
+                <strong>總分： <span class="${total >= 0 ? 'score-pos' : 'score-neg'}">${total > 0 ? '+' : ''}${total}</span></strong>
+                　紅燈：${redCount}　綠燈：${greenCount}
+                　計算燈號：${signal === 'red' ? '🔴 偏多' : signal === 'green' ? '🟢 偏空' : '⚪ 中性'}
+            </p>`;
+
         document.getElementById('modal-title').innerText = `${row.date} 分數明細`;
         document.getElementById('modal-body').innerHTML = html;
         document.getElementById('scoreModal').style.display = 'block';
@@ -366,9 +372,9 @@
     function openFormModal() {
         document.getElementById('formModal').style.display = 'block';
     }
-
     function closeFormModal() {
         document.getElementById('formModal').style.display = 'none';
+        resetForm();
     }
 
     function getMonths() {
@@ -459,42 +465,41 @@
             if (currentMonth && row.date && !row.date.startsWith(currentMonth)) continue;
 
             if (row.is_holiday) {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${row.date}</td>
-                        <td colspan="18" class="light-holiday">休市</td>
-                    </tr>`;
-                continue;
-            }
+                tbody.innerHTML += `<tr>
+                    <td><b>${row.date}</b></td>
+                    <td colspan="15" style="color: #64748b; font-style: italic;">週末假日 / 休市無交易</td>
+                    <td><span class="light-holiday">⚪ 休市</span></td>
+                    <td>-</td>
+                    <td class="actions-cell"><button onclick="editRecord(${idx})">修改</button><button class="btn-danger" onclick="deleteRecord(${idx})">刪除</button></td>
+                </tr>`;
+            } else {
+                const prev = getPreviousTradingDay(db.market_records, idx);
+                const { total, redCount, greenCount } = calculateScores(row, prev);
+                const totalCls = total > 0 ? 'score-pos' : (total < 0 ? 'score-neg' : 'score-zero');
+                const totalHtml = `<span class="${totalCls}">${total > 0 ? '+' : ''}${total}</span>`;
 
-            const prev = getPreviousTradingDay(db.market_records, idx);
-            const { total, redCount, greenCount } = calculateScores(row, prev);
-            const signal = determineOverallSignal(redCount, greenCount);
+                const calcSignal = determineOverallSignal(redCount, greenCount);
 
-            let signalHtml = '-';
-            if (signal === 'red') signalHtml = '<span class="light-red">紅燈</span>';
-            else if (signal === 'green') signalHtml = '<span class="light-green">綠燈</span>';
-            else signalHtml = '<span class="score-zero">中性</span>';
+                let signalHtml = `<span class="score-zero">⚪ 中性</span>`;
+                if (calcSignal === 'red') signalHtml = `<span class="light-red">🔴 偏多</span>`;
+                if (calcSignal === 'green') signalHtml = `<span class="light-green">🟢 偏空</span>`;
 
-            let totalHtml = total > 0 ? `<span class="score-pos">+${total}</span>` : (total < 0 ? `<span class="score-neg">${total}</span>` : `<span class="score-zero">${total}</span>`);
-
-            tbody.innerHTML += `
-                <tr>
-                    <td>${row.date}</td>
-                    <td>${row.taifex_close != null ? row.taifex_close : '-'}</td>
-                    <td>${row.spot_volume_yi != null ? row.spot_volume_yi : '-'}</td>
-                    <td>${row.margin_balance_yi != null ? row.margin_balance_yi : '-'}</td>
-                    <td>${row.usd_twd != null ? row.usd_twd : '-'}</td>
-                    <td>${row.foreign_spot_yi != null ? row.foreign_spot_yi : '-'}</td>
-                    <td>${row.trust_spot_yi != null ? row.trust_spot_yi : '-'}</td>
-                    <td>${row.dealer_spot_yi != null ? row.dealer_spot_yi : '-'}</td>
-                    <td>${row.foreign_taifex_oi != null ? row.foreign_taifex_oi : '-'}</td>
-                    <td>${row.top5_net_contracts != null ? row.top5_net_contracts : '-'}</td>
-                    <td>${row.top10_net_contracts != null ? row.top10_net_contracts : '-'}</td>
-                    <td>${row.pc_ratio_percent != null ? row.pc_ratio_percent : '-'}</td>
-                    <td>${row.foreign_opt_net_wan != null ? row.foreign_opt_net_wan : '-'}</td>
-                    <td>${row.small_taifex_retail_ratio != null ? row.small_taifex_retail_ratio : '-'}</td>
-                    <td>${row.micro_taifex_retail_ratio != null ? row.micro_taifex_retail_ratio : '-'}</td>
+                tbody.innerHTML += `<tr>
+                    <td><b>${row.date}</b></td>
+                    <td>${row.taifex_close || '-'}</td>
+                    <td>${row.spot_volume_yi || '-'}</td>
+                    <td>${row.margin_balance_yi || '-'}</td>
+                    <td>${row.usd_twd || '-'}</td>
+                    <td>${row.foreign_spot_yi || '-'}</td>
+                    <td>${row.trust_spot_yi || '-'}</td>
+                    <td>${row.dealer_spot_yi || '-'}</td>
+                    <td>${row.foreign_taifex_oi || '-'}</td>
+                    <td>${row.top5_net_contracts || '-'}</td>
+                    <td>${row.top10_net_contracts || '-'}</td>
+                    <td>${row.pc_ratio_percent ? row.pc_ratio_percent + '%' : '-'}</td>
+                    <td>${row.foreign_opt_net_wan ? row.foreign_opt_net_wan + '萬' : '-'}</td>
+                    <td>${row.small_taifex_retail_ratio ? row.small_taifex_retail_ratio + '%' : '-'}</td>
+                    <td>${row.micro_taifex_retail_ratio != null ? row.micro_taifex_retail_ratio + '%' : '-'}</td>
                     <td>${row.tsm_adr_change_percent != null ? row.tsm_adr_change_percent + '%' : '-'}</td>
                     <td>${signalHtml}</td>
                     <td>${totalHtml}</td>
