@@ -518,7 +518,7 @@
             if (res.ok) {
                 const data = await res.json();
                 klineData = data.records || [];
-                document.getElementById('chart-status').textContent = `已載入 ${klineData.length} 筆 0050 日K`;
+                document.getElementById('chart-status').textContent = `已載入 ${klineData.length} 筆 0050 日K + 台指期收盤（左軸折線）`;
                 renderChart();
             } else {
                 throw new Error('no file');
@@ -548,22 +548,53 @@
             },
             rightPriceScale: { 
                 borderVisible: true,
-                scaleMargins: { top: 0.08, bottom: 0.12 }
+                scaleMargins: { top: 0.08, bottom: 0.12 },
+                title: '0050'
+            },
+            leftPriceScale: {
+                visible: true,
+                borderVisible: true,
+                scaleMargins: { top: 0.08, bottom: 0.12 },
+                title: '台指期'
             }
         });
+
+        // 0050 K 線（右軸）
         candleSeries = chart.addCandlestickSeries({
             upColor: '#dc2626', downColor: '#16a34a',
             borderUpColor: '#dc2626', borderDownColor: '#16a34a',
-            wickUpColor: '#dc2626', wickDownColor: '#16a34a'
+            wickUpColor: '#dc2626', wickDownColor: '#16a34a',
+            priceScaleId: 'right'
         });
-        const sorted = [...klineData].sort((a, b) => a.date.localeCompare(b.date));
-        candleSeries.setData(sorted.map(d => ({
+        const sortedK = [...klineData].sort((a, b) => a.date.localeCompare(b.date));
+        candleSeries.setData(sortedK.map(d => ({
             time: d.date,
             open: d.open,
             high: d.high,
             low: d.low,
             close: d.close
         })));
+
+        // 台指期收盤（左軸，折線圖）
+        const taifexSeries = chart.addLineSeries({
+            color: '#2563eb',
+            lineWidth: 2,
+            priceScaleId: 'left',
+            title: '台指期收盤'
+        });
+
+        const taifexData = (db.market_records || [])
+            .filter(r => !r.is_holiday && r.taifex_close != null && r.date)
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .map(r => ({
+                time: r.date,
+                value: Number(r.taifex_close)
+            }));
+
+        if (taifexData.length > 0) {
+            taifexSeries.setData(taifexData);
+        }
+
         chart.timeScale().fitContent();
         window.addEventListener('resize', () => {
             chart.applyOptions({ width: container.clientWidth });
