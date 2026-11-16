@@ -12621,7 +12621,7 @@
       "is_holiday": false,
       "taifex_close": 41040.08,
       "spot_volume_yi": 9031.15,
-      "margin_balance_yi": null,
+      "margin_balance_yi": 524497.99,
       "usd_twd": 32.886,
       "foreign_spot_yi": -701.89,
       "trust_spot_yi": -179.63,
@@ -12633,7 +12633,7 @@
       "foreign_opt_net_wan": 0.8,
       "small_taifex_retail_ratio": 14.77,
       "micro_taifex_retail_ratio": 33.87,
-      "tsm_adr_change_percent": null
+      "tsm_adr_change_percent": 0
     }
   ]
 }
