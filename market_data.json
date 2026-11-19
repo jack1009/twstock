@@ -4334,7 +4334,7 @@
     },
     {
       "date": "2025-01-23",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
@@ -4353,7 +4353,7 @@
     },
     {
       "date": "2025-01-24",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
@@ -4410,7 +4410,7 @@
     },
     {
       "date": "2025-01-27",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
@@ -4429,7 +4429,7 @@
     },
     {
       "date": "2025-01-28",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
@@ -4448,7 +4448,7 @@
     },
     {
       "date": "2025-01-29",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
@@ -4467,7 +4467,7 @@
     },
     {
       "date": "2025-01-30",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
@@ -4486,7 +4486,7 @@
     },
     {
       "date": "2025-01-31",
-      "is_holiday": false,
+      "is_holiday": true,
       "taifex_close": null,
       "spot_volume_yi": null,
       "margin_balance_yi": null,
