@@ -12671,7 +12671,7 @@
       "foreign_opt_net_wan": 0.96,
       "small_taifex_retail_ratio": 16.37,
       "micro_taifex_retail_ratio": 43.0,
-      "tsm_adr_change_percent": null
+      "tsm_adr_change_percent": 0.81
     }
   ]
 }
