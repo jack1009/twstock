@@ -16605,6 +16605,25 @@
       "small_taifex_retail_ratio": 6.29,
       "micro_taifex_retail_ratio": 55.41,
       "tsm_adr_change_percent": -2.9
+    },
+    {
+      "date": "2026-11-20",
+      "is_holiday": false,
+      "taifex_close": 36033.29,
+      "spot_volume_yi": 9353.1,
+      "margin_balance_yi": 4352.27,
+      "usd_twd": 32.936,
+      "foreign_spot_yi": -95.11,
+      "trust_spot_yi": -73.47,
+      "dealer_spot_yi": -50.68,
+      "foreign_taifex_oi": -97863,
+      "top5_net_contracts": 22200,
+      "top10_net_contracts": 4061,
+      "pc_ratio_percent": 30.05,
+      "foreign_opt_net_wan": 1.59,
+      "small_taifex_retail_ratio": -1.79,
+      "micro_taifex_retail_ratio": 52.99,
+      "tsm_adr_change_percent": null
     }
   ]
 }
