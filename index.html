@@ -292,17 +292,20 @@
         }
         scores.spot_volume_yi = volScore;
 
-        // S5 foreign_taifex_oi
+        // S5 foreign_taifex_oi: level and daily change scored separately, then summed
         let fOiScore = 0;
         if (row.foreign_taifex_oi != null) {
             const curr = row.foreign_taifex_oi;
-            let delta = null;
-            if (prev && prev.foreign_taifex_oi != null) delta = curr - prev.foreign_taifex_oi;
-            if ((delta != null && delta > 3000) || curr > -15000) {
-                fOiScore = 1.0;
-            } else if (curr < -30000) {
-                fOiScore = -1.0;
+            let level = 0;
+            if (curr > -25000) level = 0.5;
+            else if (curr < -60000) level = -0.5;
+            let flow = 0;
+            if (prev && prev.foreign_taifex_oi != null) {
+                const delta = curr - prev.foreign_taifex_oi;
+                if (delta > 4000) flow = 0.5;
+                else if (delta < -4000) flow = -0.5;
             }
+            fOiScore = clamp(level + flow, -1, 1);
         }
         scores.foreign_taifex_oi = fOiScore;
 
